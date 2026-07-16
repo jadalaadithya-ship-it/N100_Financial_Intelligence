@@ -19,7 +19,6 @@ def normalize_ticker(ticker):
         return None
 
     ticker = str(ticker).strip().upper()
-
     ticker = ticker.replace(".NS", "")
     ticker = ticker.replace(".BO", "")
 

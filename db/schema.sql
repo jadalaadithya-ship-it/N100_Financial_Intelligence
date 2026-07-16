@@ -139,5 +139,5 @@ CREATE TABLE stock_prices (
     close_price REAL,
     volume REAL,
     adjusted_close REAL,
-    FOREIGN KEY(company_id) REFERENCES companies(id)
+    FOREIGN KEY(company_id) REFERENCES companies(id)    
 );
