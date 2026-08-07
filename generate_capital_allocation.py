@@ -1,28 +1,50 @@
+import sqlite3
 import pandas as pd
 
 from src.analytics.cashflow_kpis import capital_allocation_pattern
 
-data = [
-    ["TCS", "Mar 2024", 1000, -400, -300, "High Quality"],
-    ["RELIANCE", "Mar 2024", 800, -500, -100, "High Quality"],
-    ["INFY", "Mar 2024", -200, 100, 300, None],
-    ["ITC", "Mar 2024", 400, 200, 100, None],
-]
+conn = sqlite3.connect("db/nifty100.db")
+
+query = """
+SELECT
+    c.company_id,
+    c.year,
+    c.operating_activity,
+    c.investing_activity,
+    c.financing_activity
+FROM cashflow c
+"""
+
+df = pd.read_sql(query, conn)
 
 rows = []
 
-for company, year, cfo, cfi, cff, quality in data:
+for _, row in df.iterrows():
+
+    cfo = row["operating_activity"]
+    cfi = row["investing_activity"]
+    cff = row["financing_activity"]
+
     rows.append({
-        "company_id": company,
-        "year": year,
+        "company_id": row["company_id"],
+        "year": row["year"],
         "cfo_sign": "+" if cfo >= 0 else "-",
         "cfi_sign": "+" if cfi >= 0 else "-",
         "cff_sign": "+" if cff >= 0 else "-",
-        "pattern_label": capital_allocation_pattern(cfo, cfi, cff, quality)
+        "pattern_label": capital_allocation_pattern(
+            cfo,
+            cfi,
+            cff,
+            None
+        )
     })
 
-df = pd.DataFrame(rows)
+output = pd.DataFrame(rows)
 
-df.to_csv("output/capital_allocation.csv", index=False)
+output.to_csv(
+    "output/capital_allocation.csv",
+    index=False
+)
 
+print("Rows:", len(output))
 print("capital_allocation.csv created successfully!")
